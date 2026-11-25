@@ -19,7 +19,7 @@ const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const col=collection(db,'events');
 
-$('fDay').innerHTML=Array.from({length:31},(_,i)=>`<option value="${i+1}">${dayName(i+1)} ${i+1}</option>`).join('');
+$('fDay').innerHTML=Array.from({length:11},(_,i)=>`<option value="${i+18}">${dayName(i+18)} ${i+18}</option>`).join('');
 const byDay=d=>events.filter(e=>e.day===d).sort((a,b)=>SLOTS.findIndex(s=>s[0]===a.slot)-SLOTS.findIndex(s=>s[0]===b.slot)||(a.at||0)-(b.at||0));
 const chip=e=>`<span class="chip"><i class="dot d-${esc(e.slot)}"></i><span>${esc(e.title)}</span></span>`;
 
@@ -28,6 +28,7 @@ function render(){
   for(let i=0;i<FIRST;i++)h+='<div class="cell empty" aria-hidden="true"></div>';
   for(let d=1;d<=31;d++){
     const ev=byDay(d);
+    if(!VISIT(d)){h+=`<div class="cell off" aria-hidden="true"><span class="num">${d}</span></div>`;continue;}
     h+=`<button type="button" class="cell${VISIT(d)?' visit':''}${d===24||d===25?' xmas':''}" data-d="${d}" aria-label="${dayName(d)} ${d} de diciembre, ${ev.length} planes">
       <span class="num">${d}${NOTE[d]?`<span class="tag">${NOTE[d]}</span>`:''}</span>
       ${ev.slice(0,4).map(chip).join('')}${ev.length>4?`<span class="more">+${ev.length-4} más</span>`:''}</button>`;
@@ -37,7 +38,7 @@ function render(){
   let a='';
   for(let d=1;d<=31;d++){
     const ev=byDay(d);
-    if(!showAll&&!VISIT(d)&&!ev.length)continue;
+    if(!VISIT(d))continue;
     a+=`<button type="button" class="aday${VISIT(d)?' visit':''}" data-d="${d}"><span class="num">${d}<small>${dayName(d)}</small></span>
       <span>${ev.length?ev.map(chip).join(''):'<span class="none">Día libre</span>'}${NOTE[d]?`<span class="tag">${NOTE[d]}</span>`:''}</span></button>`;
   }
@@ -56,7 +57,7 @@ function renderSheet(){
   $('fDay').value=String(d);
 }
 
-function openDay(d){current=d;renderSheet();$('wrap').classList.add('open');$('sheet').setAttribute('aria-hidden','false');setTimeout(()=>$('fTitle').focus(),50);}
+function openDay(d){if(!VISIT(d))return;current=d;renderSheet();$('wrap').classList.add('open');$('sheet').setAttribute('aria-hidden','false');setTimeout(()=>$('fTitle').focus(),50);}
 function close(){current=null;$('wrap').classList.remove('open');$('sheet').setAttribute('aria-hidden','true');}
 const setStatus=t=>{$('status').textContent=t;};
 const fail=()=>setStatus('No se pudo guardar. Revisa tu conexión e intenta otra vez.');
@@ -72,12 +73,12 @@ document.addEventListener('click',e=>{
 $('addBtn').onclick=()=>openDay(current||18);
 $('closeBtn').onclick=close;$('scrim').onclick=close;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
-$('showAll').onclick=()=>{showAll=!showAll;$('showAll').textContent=showAll?'Ver solo días de visita':'Ver todo diciembre';render();};
 
 $('form').addEventListener('submit',async e=>{
   e.preventDefault();
   const title=$('fTitle').value.trim();if(!title)return;
   const day=+$('fDay').value,slot=$('fSlot').value;
+  if(!VISIT(day))return;
   $('fSave').disabled=true;
   try{await addDoc(col,{day,slot,title:title.slice(0,120),at:Date.now()});$('fTitle').value='';if(day!==current)openDay(day);}
   catch(err){fail();}

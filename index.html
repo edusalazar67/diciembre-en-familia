@@ -38,7 +38,8 @@ button{font:inherit;cursor:pointer}
 .cell{position:relative;min-height:128px;padding:8px 8px 10px;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:none;color:inherit;text-align:left;display:flex;flex-direction:column;gap:4px}
 .cell.visit{background:var(--wash)}
 .cell.empty{background:repeating-linear-gradient(135deg,transparent 0 8px,color-mix(in srgb,var(--line) 45%,transparent) 8px 9px);cursor:default}
-.cell:not(.empty):hover{box-shadow:inset 0 0 0 2px var(--blue)}
+.cell.off{cursor:default;opacity:.45}.cell.off .num{font-size:18px}
+.cell:not(.empty):not(.off):hover{box-shadow:inset 0 0 0 2px var(--blue)}
 .num{font:400 22px/1 Gloock,Georgia,serif;display:flex;justify-content:space-between;align-items:center}
 .cell.xmas .num{color:var(--red)}
 .tag{font:600 11px/1 Figtree,sans-serif;color:var(--red)}
@@ -82,7 +83,7 @@ input,select{font:inherit;font-size:16px;min-height:44px;width:100%;padding:0 12
   <header>
     <div>
       <h1>Diciembre en familia</h1>
-      <p class="sub">Itinerario de visitas, 18 al 28 de diciembre de 2026. Toca un día para ver, agregar o quitar planes.</p>
+      <p class="sub">Itinerario de visitas, 18 al 28 de diciembre de 2026. Toca un día del 18 al 28 para ver, agregar o quitar planes.</p>
     </div>
     <div class="legend">
       <span><i class="dot d-manana"></i>Mañana</span><span><i class="dot d-tarde"></i>Tarde</span><span><i class="dot d-noche"></i>Noche</span>
@@ -91,7 +92,6 @@ input,select{font:inherit;font-size:16px;min-height:44px;width:100%;padding:0 12
   </header>
   <p class="status" id="status" role="status">Cargando el calendario…</p>
   <div class="grid" id="grid"></div>
-  <button class="ghost show-all" id="showAll" type="button">Ver todo diciembre</button>
   <div class="agenda" id="agenda"></div>
 </div>
 
